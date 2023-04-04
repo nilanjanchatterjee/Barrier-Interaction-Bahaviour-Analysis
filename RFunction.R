@@ -3,9 +3,10 @@ library(adehabitatLT)
 library(move)
 library(ggplot2)
 library(dplyr)
+library(RColorBrewer)
 
 rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=36, w=72,
-                     max_cross = 1,  sd_multiplier = 1,units = "hours")
+                     max_cross = 0,  sd_multiplier = 1,units = "hours")
 {
   Sys.setenv(tz="UTC")
   
@@ -140,10 +141,22 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
   
     encounter_dat <-do.call(rbind, rd_enctr)  
   
+    rs <-raster(extent(data), res = .05, crs= projection(roads)) ## create the raster of the dataset
+    enc_dat <-cbind(encounter_dat$coords.x1, encounter_dat$coords.x2) ##extract the coordinates
+    
+    tab <- table(cellFromXY(rs, enc_dat))
+    rs[as.numeric(names(tab))] <- tab
+    d <- data.frame(coordinates(rs), count=rs[])
+    d<-d[complete.cases(d$count),]
+    
   ### Plot the encounter locations of road and the buffer  
-  # ggplot()+geom_sf(data=roads_buffer, size=0.5)+
-  #   geom_sf(data=roads_crop, col="brown", size=1)+
-  #   geom_sf(data=encounter_dat) + theme_bw()
+density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
+    geom_sf(data=roads_crop, col="brown", size=1)+
+    geom_tile(data= d, aes(x= x, y=y, fill = count), alpha=0.9)+
+    scale_fill_distiller(palette = "Spectral", direction = -1)+
+    labs(x= "Longitude", y= "Latitude", fill= "Number of animal\nlocations")+
+    #geom_sf(data=encounter_dat) + 
+    theme_bw()
 
   ##########################################################################################
   ############ Classifying barrier behaviors
@@ -275,7 +288,7 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
       #animal_i$continuousID <- cumsum(abs(c(interval, round(as.numeric(diff(animal_i$timestamp), units = "hours"), digits = 1)) - interval)) # sep 11, 2020. added abs() to accomodate potential data points with smaller time intervals
       animal_i$continuousID <- animal_i$trackId
         
-      # for each continuous sections, calculate straigness of all movements lasting the duration of our event (moving window of the size of the encounter)
+      # for each continuous sections, calculate straightness of all movements lasting the duration of our event (moving window of the size of the encounter)
       straightnesses_i <- NULL
       for(ii in unique(animal_i$continuousID)) {
         animal_ii <- animal_i[animal_i$continuousID == ii, ]
@@ -302,13 +315,11 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
                         mean(straightnesses_i) + sd_multiplier *0.01)
         lower <- ifelse(is.na(sd(straightnesses_i, na.rm=T)) == FALSE, mean(straightnesses_i, na.rm=T) - sd_multiplier * sd(straightnesses_i, na.rm=T),
                         mean(straightnesses_i) - sd_multiplier *0.01)
-        if(is.na(lower) & is.na(upper) == FALSE) 
-        {event_df[i, ]$eventTYPE = "unknown"}
-        else{
+        
         if(straightness_i < lower) event_df[i, ]$eventTYPE <- ifelse(event_i$cross < max_cross, "Back_n_forth", "unknown")
         if(straightness_i > upper) event_df[i, ]$eventTYPE <- ifelse(event_i$cross < max_cross, "Trace", "unknown")
         if(straightness_i >= lower & event_i$straightness <= upper) event_df[i, ]$eventTYPE <- "Average_Movement"
-        } 
+        
       } else {
         event_df[i, ]$eventTYPE = "unknown"
         if(is.null(straightnesses_i)) {straightnesses_i <- NA} # adding this to avoid warning message when ploting.
@@ -325,6 +336,7 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
                      labs(title = paste(i, "_",classification))+ theme_bw()
       }
     }
+  }
   
   ## clean the encounter spdataframe ##
   encounter_data <- encounter_dat[!duplicated(encounter_dat$burstID),]
@@ -337,13 +349,15 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
   for (i in unique(encounter_dat$burstID)) {
     print(plot_list[[i]])
   }
-  dev.off() 
+  dev.off()
   
-  write.csv(encounter_data, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_data.csv"))
+  ggsave(density_plot, filename = paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"), "Point_count.jpeg"),
+         width = 9, height = 6, dpi=300, units = "in")
+  # #write.csv(encounter_data, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_data.csv"))
   write.csv(event_df, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_event_data.csv"))
   
   return(data)
-  }
+  
 }
 
   
