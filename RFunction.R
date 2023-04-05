@@ -351,7 +351,7 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
   }
   dev.off()
   
-  ggsave(density_plot, filename = paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"), "Point_count.jpeg"),
+  ggsave(density_plot, filename = paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"), "Point_count_density.jpeg"),
          width = 9, height = 6, dpi=300, units = "in")
   # #write.csv(encounter_data, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_data.csv"))
   write.csv(event_df, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_event_data.csv"))
