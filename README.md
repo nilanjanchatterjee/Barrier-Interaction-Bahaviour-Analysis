@@ -20,7 +20,7 @@ Animals do not behave in the usual manner when they encounter linear features an
 
 ### Artefacts
 - Encounter_event_data.csv: Details of the identified behaviours
-- Encounter_data.csv : Details of the road encounters 
+- Point_count_density.jpeg: Figure showing the number of animal locations at each pixel along the barrier 
 - Event_plot_output.pdf: Document of plot of all identified behaviors 
 
 
