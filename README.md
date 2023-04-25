@@ -19,6 +19,22 @@ Animals do not behave in the usual manner when they encounter linear features an
 *Road encounter* in .csv format   
 
 ### Artefacts
+* `Encounter_data.csv`: details of the road encounters (see below)  
+* `Encounter_event_data.csv`: details of the identified behaviours (see below)  
+* `Event_plot_output.pdf`: Document with plots of each identified encounter. Plots include a label with the burstID and the identified behaviour for each encounter, the features (red line), buffer area (grey), the animal locations (blue dot), and lines between consecutive animal locations (black line).  
+
+Attributes in the artefacts files include the following:
+* Individual_ID: the animal ID
+* trackId: the animal ID
+* burstID: an identifier for the burst of events associated with the encounter
+* geometry: the coordinate geometry of the first location in the encounter (format `c(-long, lat)` in WGS84)
+* long and lat: the coordinates of the first location in the encounter (WGS84)
+* tmestamp: the timestamp associated with the start of the encounter (format `yyyy-MM-dd HH:mm:ss.SSS` in UTC)
+* start_time and end_time: the timestamps associated with the beginning and end of the encounter (format `yyyy-MM-dd HH:mm:ss.SSS` in UTC)
+* duration: the duration of the encounter (in hours)
+* cross: the number of feature crossings during the encounter
+* straightness: The straightness of travel over a period around the encounter. This is an index (value range 0-1) calculated as D/L, where D is the straightline distance between the first and last location fixes, and L is the distance between all location fixes, over this period (Batschelet 1981, *Circular statistics in biology*).
+* eventTYPE: the type of encounter behaviour (e.g., Bounce, TBD, Trapped, unknown, Quick_Cross)
 - Encounter_event_data.csv: Details of the identified behaviours
 - Point_count_density.jpeg: Figure showing the number of animal locations at each pixel along the barrier 
 - Event_plot_output.pdf: Document of plot of all identified behaviors 
@@ -33,4 +49,4 @@ w: The length of time, to include around the encounter event to calculate averag
 ### Null or error handling
 *The app contains road shapefile from the Y2Y region but users can upload their own shapefiles also. Please be careful that the projection of the barrier feature shapefile should be lat-long (epsg 4326). Moreover, the identified behaviours are function of the user specified input (buffer and time), please be careful and use time intervals with respect to the fix-intervals.*
 
-*Example* : **Parameter `b_time`**:  should not be smaller than the fix-intervals. If your data set has very different fix-intervals please create multiple workflows of individuals with similar fix-intervals.
+*Example* : **Parameter `b_time`**  should not be smaller than the fix-intervals. If your data set has very different fix-intervals please create multiple workflows of individuals with similar fix-intervals.
