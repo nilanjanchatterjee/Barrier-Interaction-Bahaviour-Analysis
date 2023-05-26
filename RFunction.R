@@ -6,7 +6,7 @@ library(dplyr)
 library(RColorBrewer)
 
 rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=36, w=72,
-                     max_cross = 0,  sd_multiplier = 1,units = "hours")
+                     max_cross = 1,  sd_multiplier = 10,units = "hours")
 {
   Sys.setenv(tz="UTC")
   
@@ -210,7 +210,8 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
         geom_sf(data = encounter_i, size=1, col ="blue")+
         lims(x=c(st_bbox(mov_seg_i)[1]-0.05,st_bbox(mov_seg_i)[3]+0.05),
              y=c(st_bbox(mov_seg_i)[2]-0.05,st_bbox(mov_seg_i)[4]+0.05))+
-        labs(title = paste(i, "_",classification))+
+        labs(title = paste(i, "_",classification),
+             subtitle = )+
         theme_bw()
         
     }
@@ -243,7 +244,8 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
           geom_sf(data = encounter_i, size=1, col ="blue")+
           lims(x=c(st_bbox(mov_seg_i)[1]-0.05,st_bbox(mov_seg_i)[3]+0.05),
                y=c(st_bbox(mov_seg_i)[2]-0.05,st_bbox(mov_seg_i)[4]+0.05))+
-          labs(title = paste(i, "_",classification))+
+          labs(title = paste(i, "_",classification),
+               subtitle = )+
           theme_bw()
       }
     }
@@ -269,7 +271,8 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
     if (event_df[i, ]$eventTYPE == "TBD") {
       event_i <- event_df[i, ]
       duration_i <- event_i$duration
-      straightness_i <- event_i$straightness
+      straightness_i <-  ifelse(is.na(event_i$straightness)==FALSE,event_i$straightness,
+                                mean(event_df$straightness, na.rm=T))
       interval <-interval_dat$fix_int[uid == event_i$Individual_ID]
       
       # get movement data of the individual of interest
@@ -309,17 +312,17 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
       # make sure there are enough data to calculate average monthly straightness before and after the encounter event
       # (w/interval + 1) is the total possible segments if all data are present. 
       # We define "enough" as at least 1/4 of the total possible segments are present to calculate average straightness.
-      if (length(straightnesses_i) >= (w/interval + 1)/4) {
+      if (length(straightnesses_i) >= (w/interval + 1)/2) {
         # minimum max number possible/2 to calculate sd
         upper <- ifelse(is.na(sd(straightnesses_i, na.rm=T)) == FALSE, mean(straightnesses_i, na.rm=T) + sd_multiplier * sd(straightnesses_i, na.rm=T),
-                        mean(straightnesses_i) + sd_multiplier *0.01)
+                        mean(straightness_i) + sd_multiplier *0.01)
         lower <- ifelse(is.na(sd(straightnesses_i, na.rm=T)) == FALSE, mean(straightnesses_i, na.rm=T) - sd_multiplier * sd(straightnesses_i, na.rm=T),
-                        mean(straightnesses_i) - sd_multiplier *0.01)
+                        mean(straightness_i) - sd_multiplier *0.01)
         
         if(straightness_i < lower) event_df[i, ]$eventTYPE <- ifelse(event_i$cross < max_cross, "Back_n_forth", "unknown")
         if(straightness_i > upper) event_df[i, ]$eventTYPE <- ifelse(event_i$cross < max_cross, "Trace", "unknown")
-        if(straightness_i >= lower & event_i$straightness <= upper) event_df[i, ]$eventTYPE <- "Average_Movement"
-        
+        if(straightness_i >= lower & straightness_i <= upper) event_df[i, ]$eventTYPE <- "Average_Movement"
+        next
       } else {
         event_df[i, ]$eventTYPE = "unknown"
         if(is.null(straightnesses_i)) {straightnesses_i <- NA} # adding this to avoid warning message when ploting.
@@ -351,6 +354,10 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
   }
   dev.off()
   
+  ##Filtering the super long events with a cutoff of 7 days 
+  event_df <-event_df %>% filter (duration < 168) 
+  
+  ## Saving the outputs
   ggsave(density_plot, filename = paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"), "Point_count_density.jpeg"),
          width = 9, height = 6, dpi=300, units = "in")
   # #write.csv(encounter_data, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_data.csv"))

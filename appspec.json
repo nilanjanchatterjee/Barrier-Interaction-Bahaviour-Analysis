@@ -37,7 +37,7 @@
      "providedAppFiles": [
     {
       "settingId": "barrier_files",
-      "from": "data/GRIP_roads_NASAY2Y/"
+      "from": "provided-app-files/barrier_files/"
     }
   ],
     
