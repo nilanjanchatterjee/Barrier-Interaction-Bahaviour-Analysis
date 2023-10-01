@@ -6,7 +6,7 @@ library(dplyr)
 library(RColorBrewer)
 
 rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=36, w=72,
-                     max_cross = 1,  sd_multiplier = 10,units = "hours")
+                     max_cross = 0,  sd_multiplier = 10,units = "hours")
 {
   Sys.setenv(tz="UTC")
   
@@ -336,7 +336,7 @@ density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
                      geom_sf(data = encounter_i, size=1, col ="blue")+
                      lims(x=c(st_bbox(mov_seg_i)[1]-0.05,st_bbox(mov_seg_i)[3]+0.05),
                           y=c(st_bbox(mov_seg_i)[2]-0.05,st_bbox(mov_seg_i)[4]+0.05))+
-                     labs(title = paste(i, "_",classification))+ theme_bw()
+                     labs(title = paste(i, "_",event_df[i, ]$eventTYPE))+ theme_bw()
       }
     }
   }

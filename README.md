@@ -20,7 +20,7 @@ Animals do not behave in the usual manner when they encounter linear features an
 
 ### Artefacts
 * `Encounter_data.csv`: details of the road encounters (see below)  
-* `Encounter_event_data.csv`: details of the identified behaviours (see below)  
+* `Point_count_density.jpeg`: Figure showing the number of animal locations at each pixel along the barrier 
 * `Event_plot_output.pdf`: Document with plots of each identified encounter. Plots include a label with the burstID and the identified behaviour for each encounter, the features (red line), buffer area (grey), the animal locations (blue dot), and lines between consecutive animal locations (black line).  
 
 Attributes in the artefacts files include the following:
