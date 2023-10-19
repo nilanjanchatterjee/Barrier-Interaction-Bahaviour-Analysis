@@ -1,8 +1,9 @@
 library(sf)
 library(adehabitatLT)
-library(move)
+library(move2)
 library(ggplot2)
 library(dplyr)
+library(raster)
 library(RColorBrewer)
 
 rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=36, w=72,
@@ -58,13 +59,18 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
   roads_crop <- st_crop(roads, st_bbox(data))
   roads_buffer <-st_buffer(roads_crop, dist= buffer)
   
+  data <- data |> mutate(location.long = sf::st_coordinates(data)[,1],
+                         location.lat = sf::st_coordinates(data)[,2],
+                         trackId = mt_track_id(data),
+                         timestamp = mt_time(data))
+  
   data_df <- as.data.frame(data)
-  coo <- data.frame(coordinates(data))
-  names(coo) <- c("location.long","location.lat")
-  names(data_df) <- make.names(names(data_df),allow_=FALSE)
-  data_df <- data.frame(data_df,coo)
-  data_df$timestamp<- move::timestamps(data)
-  data_df$trackId<- move::trackId(data)
+  #coo <- data.frame(st_coordinates(data))
+  #names(coo) <- c("location.long","location.lat")
+  #names(data_df) <- make.names(names(data_df),allow_=FALSE)
+  #data_df <- data.frame(data_df,coo)
+  #data_df$timestamp<- move::timestamps(data)
+  #data_df$trackId<- move::trackId(data)
   data_df$ptsID <-NA
   
   uid <-unique(data_df$trackId)
@@ -81,7 +87,7 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
     class(interval_dat$fix_int)<-"numeric"
     
     temp_dat_sf <-st_as_sf(temp_dat,coords=c("location.long", "location.lat"), 
-                           crs= crs(roads_buffer))
+                           crs = st_crs(4326))
     rd_enctr_temp <-st_intersection(temp_dat_sf, roads_buffer)
     rd_enctr_temp <-rd_enctr_temp[,names(rd_enctr_temp) %in% names(temp_dat_sf)]
     
@@ -140,8 +146,10 @@ rFunction <-function(data, barrier_files = NULL, buffer=1000, b_time=4, p_time=3
     }
   
     encounter_dat <-do.call(rbind, rd_enctr)  
-  
-    rs <-raster(extent(data), res = .05, crs= projection(roads)) ## create the raster of the dataset
+    encounter_dat <-encounter_dat |> mutate(coords.x1 = sf::st_coordinates(encounter_dat)[,1],
+                                            coords.x2 = sf::st_coordinates(encounter_dat)[,2])
+      
+    rs <-raster(extent(as.vector(st_bbox(data))[c(1, 3, 2, 4)]), res = .05, crs= projection(roads)) ## create the raster of the dataset
     enc_dat <-cbind(encounter_dat$coords.x1, encounter_dat$coords.x2) ##extract the coordinates
     
     tab <- table(cellFromXY(rs, enc_dat))
