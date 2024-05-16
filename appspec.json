@@ -106,6 +106,18 @@
 	"name": "NASA MoveApps Project"
 	}
   ],
+"references":[
+  {
+    "type": "IsDerivedFrom",
+    "note": "Function BaBA() of R package `BaBA`.",
+    "url": "https://github.com/wx-ecology/BaBA/"
+  },
+	{
+    "type": "IsDescribedBy",
+    "note": "Xu W, Dejid N, Herrmann V, Sawyer H, Middleton AD. Barrier Behaviour Analysis (BaBA) reveals extensive effects of fencing on wide-ranging ungulates. J Appl Ecol. 2020;00:1–9.",
+    "url": "https://doi.org/10.1111/1365-2664.13806"
+  },
+ ]
   "documentation" : {
     "url": "https://github.com/nilanjanchatterjee/Barrier_Interaction_Bahaviour_Analysis/blob/master/README.md"
   }
