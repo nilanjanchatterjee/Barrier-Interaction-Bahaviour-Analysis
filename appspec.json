@@ -37,7 +37,7 @@
      "providedAppFiles": [
     {
       "settingId": "barrier_files",
-      "from": "data/auxiliary/user-files/provided-app-files/barrier_files/roads.shp"
+      "from": "data/auxiliary/user-files/provided-app-files/barrier_files/"
     }
   ],
     
