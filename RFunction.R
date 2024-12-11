@@ -41,7 +41,7 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
     # if (round(p) != p) stop("p_time must be divisible by interval")
     # 
     
-    roads <- st_read(paste0(getAppFilePath("barrier_files"),"roads.shp"))
+    roads <- st_read(paste0(getAuxiliaryFilePath("barrier_files"),"roads.shp"))
     roads_crop <- st_crop(roads, st_bbox(data))
     #roads_buffer <-st_buffer(roads_crop, dist= buffer)
     
