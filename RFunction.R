@@ -40,8 +40,12 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
     # p <- p_time / interval
     # if (round(p) != p) stop("p_time must be divisible by interval")
     # 
-    
-    roads <- st_read(paste0(getAuxiliaryFilePath("barrier_files"),"roads.shp"))
+  shp_path <- getAuxiliaryFilePath("barrier_files")
+  dir.create(targetDirFiles <- tempdir())
+  unzip(shp_path, exdir = targetDirFiles)
+  roads <- sf::st_read(list.files(targetDirFiles,pattern=".shp",recursive=T))
+  
+    #roads <- st_read(paste0(getAuxiliaryFilePath("barrier_files"),"roads.shp"))
     roads_crop <- st_crop(roads, st_bbox(data))
     #roads_buffer <-st_buffer(roads_crop, dist= buffer)
     
