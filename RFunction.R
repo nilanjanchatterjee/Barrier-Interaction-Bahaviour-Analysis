@@ -151,7 +151,7 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
     d<-d[complete.cases(d$count),]
     
     ### Plot the encounter locations of road and the buffer  
-    density_plot <-  ggplot()+geom_sf(data=roads_buffer, size=0.5)+
+    density_plot <-  ggplot()+geom_sf(data=barrier_buffer, size=0.5)+
       geom_sf(data=roads_crop, col="brown", size=1)+
       geom_tile(data= d, aes(x= x, y=y, fill = count), alpha=0.9)+
       scale_fill_distiller(palette = "Spectral", direction = -1)+
