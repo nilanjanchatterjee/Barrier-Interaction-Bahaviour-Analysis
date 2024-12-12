@@ -11,15 +11,16 @@ The app identifies and classifies different behaviors of animal encounters with 
 Animals do not behave in the usual manner when they encounter linear features and barriers. The app identifies these different behavior classes based on the changes in movement. The identified behaviors can be classified into three broad classes **Usual movement**, **Altered movement** and **Trapped**. **Usual movement** consists of Average movement and Quick cross, **Altered movement** consists of Bounce, Back and Forth and Trace while **Trapped** is signified when the animal movement is restricted within a close vicinity of the feature for a significant time. For more details about the behavior classes please go through the manuscript on BaBA app by Xu et al. 2021 (https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13806).
 
 ### Input data
-*move/moveStack* in Movebank format
+*move2_loc* 
+
 *Linear feature layers* in Shapefile(.shp) format
 
 ### Output data
-*MoveStack* in Movebank format   
-*Road encounter* in .csv format   
+*move2_loc*
+
 
 ### Artefacts
-* `Encounter_data.csv`: details of the road encounters (see below)  
+* `Encounter_event_data.csv`: details of the road encounters (see below)  
 * `Point_count_density.jpeg`: Figure showing the number of animal locations at each pixel along the barrier 
 * `Event_plot_output.pdf`: Document with plots of each identified encounter. Plots include a label with the burstID and the identified behaviour for each encounter, the features (red line), buffer area (grey), the animal locations (blue dot), and lines between consecutive animal locations (black line).  
 

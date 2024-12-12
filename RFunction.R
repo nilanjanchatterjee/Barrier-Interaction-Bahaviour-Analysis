@@ -41,7 +41,7 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
     # if (round(p) != p) stop("p_time must be divisible by interval")
     # 
     
-    roads <- st_read(paste0(getAppFilePath("barrier_files"),"roads.shp"))
+    roads <- st_read(paste0(getAuxiliaryFilePath("barrier_files"),"roads.shp"))
     roads_crop <- st_crop(roads, st_bbox(data))
     #roads_buffer <-st_buffer(roads_crop, dist= buffer)
     
@@ -352,7 +352,7 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
       dplyr::select(trackId, burstID, timestamp, eventTYPE)
     
     ### Print all the classified encounters in one pdf file
-    pdf(paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Event_plot_output.pdf"))
+    pdf(appArtifactPath("Event_plot_output.pdf"))
     par(mfrow=c(2,2), mar=c(4,4,3,1))
     
     #encounter_final_sub<- subset(encounter_final ,!(eventTYPE %in% c("Bounce", "Quick_Cross")))
@@ -362,10 +362,10 @@ rFunction <-  function(data, barrier_files = NULL, buffer=1000,  b_time = 4, p_t
     dev.off()
     
     ## Saving the outputs
-    ggsave(density_plot, filename = paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"), "Point_count_density.jpeg"),
+    ggsave(density_plot, filename = appArtifactPath("Point_count_density.jpeg"),
            width = 9, height = 6, dpi=300, units = "in")
     # #write.csv(encounter_data, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_data.csv"))
-    write.csv(event_df, file= paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR", "/tmp/"),"Encounter_event_data.csv"))
+    write.csv(event_df, file= appArtifactPath("Encounter_event_data.csv"))
     
     return(data)
   
